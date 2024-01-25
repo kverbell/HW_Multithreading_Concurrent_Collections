@@ -37,10 +37,7 @@ public class Main {
         Thread threadA = new Thread(() -> {
             while (!producerFinished.get()) {
                 try {
-                    int a = countSymbol("a", queueForA, lengthText);
-                    if (a > maxA.get()) {
-                        maxA.set(a);
-                    }
+                    countSymbol("a", queueForA, lengthText, maxA);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -51,10 +48,7 @@ public class Main {
         Thread threadB = new Thread(() -> {
             while (!producerFinished.get()) {
                 try {
-                    int b = countSymbol("b", queueForB, lengthText);
-                    if (b > maxB.get()) {
-                        maxB.set(b);
-                    }
+                    countSymbol("b", queueForB, lengthText, maxB);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -65,10 +59,7 @@ public class Main {
         Thread threadC = new Thread(() -> {
             while (!producerFinished.get()) {
                 try {
-                    int c = countSymbol("c", queueForC, lengthText);
-                    if (c > maxC.get()) {
-                        maxC.set(c);
-                    }
+                    countSymbol("c", queueForC, lengthText, maxC);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -90,16 +81,22 @@ public class Main {
         System.out.println("Символ c встречается максимум " + maxC + " раз");
     }
 
+    public static void countSymbol(String symbol, BlockingQueue<String> counterChar, int lengthText,
+                                   AtomicInteger maxSymbol) throws InterruptedException {
 
-    public static int countSymbol(String symbol, BlockingQueue<String> counterChar, int lengthText) throws InterruptedException {
-        int symbolCount = 0;
+        int count = 0;
         char[] sCharArray = counterChar.take().toCharArray();
-            for (int i = 0; i < lengthText; i++) {
-                if (sCharArray[i] == symbol.charAt(0)) {
-                    symbolCount++;
-                }
+
+        for (int i = 0; i < lengthText; i++) {
+            if (sCharArray[i] == symbol.charAt(0)) {
+                count++;
             }
-        return symbolCount;
+        }
+
+        if (count > maxSymbol.get()) {
+            maxSymbol.set(count);
+        }
+
     }
 
     public static String generateText(String letters, int length) {
